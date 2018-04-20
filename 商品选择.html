@@ -1,0 +1,144 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>无标题文档</title>
+<style>
+body,ul,li,span{ margin:0; padding:0; list-style:none; font-size:14px;}
+#box{ width:1000px; height:500px; background:url(bg.gif) no-repeat; margin:0 auto; position:relative;}
+#content{ width:760px; height:260px; background:#eff7f6; position:absolute; left:120px; top:145px; opacity:0.8; margin-bottom:20px;}
+#headTitle{ height:50px; background:#e0f0ee; display:-webkit-box; line-height:50px; text-align:center; padding-left:20px;}
+.select{ height:24px; border:1px solid #28a5c4; line-height:24px; text-align:center; margin-top:13px; margin-left:10px; padding-left:4px; float:left;}
+.select img { margin-left:8px; position:relative;top:3px; margin-right:3px;}
+
+#list{ height:190px; width:720px; position:absolute; left:120px; top:215px; opacity:0.8; padding-left:20px; padding-right:20px;}
+.row{ border-bottom:1px dashed #6cd7f2; width:720px; height:42px; line-height:42px; display:-webkit-box;}
+.row ul li{float:left; margin-left:10px; margin-right:10px;}
+.row span{ color:#666;}
+.active{ color:#35afd2;}
+.normalColor{ color:#000;}
+</style>
+
+</head>
+
+<body>
+<div id="box">
+	<div id="content">
+    	<div id="headTitle">
+        	<div>你的选择 :</div>
+        </div>
+    </div>
+	<div id="list">
+    </div>
+</div>
+</body>
+</html>
+<script>
+	//添加筛选的标签
+	var oHeadTitle = document.getElementById('headTitle');
+	var oList = document.getElementById('list');
+	//加载列表数据
+	var crumbData = [
+			{
+				"title": "品牌",
+				"data": [ "苹果","小米","锤子","魅族","华为","三星","OPPO","vivo","乐视","360","中兴","索尼"]
+			},
+			{
+				"title": "尺寸",
+				"data": ["4.0-4.5英寸","4.6-4.9英寸","5.0-5.5英寸","6.0英寸以上"]
+			},
+			{
+				"title": "系统",
+				"data": ["android","ios","window phone","无","其他"]
+			},
+			{
+				"title": "网络",
+				"data": ["联通3G","双卡单4G","双卡双4G","联通4G"]
+			}
+		];
+	for(var i=0; i<crumbData.length;i++)
+	{
+		var oDiv = document.createElement('div');
+		oDiv.className="row";
+		var oSpan = document.createElement('span');
+		oSpan.innerHTML = crumbData[i].title+':';
+		oDiv.appendChild(oSpan);
+		var oUl = document.createElement('ul');
+		oUl.className="ulname";
+		for(var j=0;j<crumbData[i].data.length;j++)
+		{	
+			var oLi = document.createElement('li');
+			oLi.innerHTML=crumbData[i].data[j];
+			oUl.appendChild(oLi);
+		}
+		oDiv.appendChild(oUl);
+		oList.appendChild(oDiv);
+	}
+	var ul=document.getElementsByTagName('ul');
+	
+	for(var i=0; i<ul.length;i++){
+		ul[i].index=i;
+		ul[i].last=null;
+	}
+	for(var i=0; i<ul.length;i++){
+		var li=ul[i].children;
+		for(var j=0;j<li.length; j++)
+		{
+			li[j].onclick=function(){
+				if(this.parentNode.last!=null)
+				{
+					this.parentNode.last.className="normalColor";
+				}
+				this.className="active";
+				//向标题添加点击的列表
+				var oDiv = document.createElement('div');
+				oDiv.className = " select";
+				oDiv.index=this.parentNode.index;
+				var oSpan = document.createElement('span');
+				oSpan.innerHTML = this.innerHTML;
+				oDiv.appendChild(oSpan);
+				var oImg = document.createElement('img');
+				oImg.src = "delete.gif";
+				oImg.className='imgs';
+				oDiv.appendChild(oImg);
+				oHeadTitle.appendChild(oDiv);
+				this.parentNode.last=this;
+				var oSelect=document.getElementsByClassName('select');
+				
+				//删除重复的节点
+				for(var k=0;k<oSelect.length-1;k++)
+				{
+					if(oDiv.index==oSelect[k].index)
+					{
+						//oHeadTitle.removeChild(oSelect[k]);
+						oHeadTitle.replaceChild(oSelect[oSelect.length-1],oSelect[k]);
+					}
+				}
+				//排序
+				var len = oSelect.length;
+            	for (var q = 0; q < len; q++) {
+              		if(oSelect[len-1].index<oSelect[q].index)
+					{
+						oHeadTitle.insertBefore(oSelect[len-1],oSelect[q]);
+					}
+            	}
+				//删除节点
+				var imgList = document.getElementsByClassName('imgs');
+				for(var w=0;w<imgList.length;w++)
+				{
+					imgList[w].onclick=function(){
+						var key=this.parentNode.index;
+						this.parentNode.parentNode.removeChild(this.parentNode);
+						//把被删除的头部标题中节点对应的一行li的颜色变为初始颜色
+						var ulname= document.getElementsByClassName("ulname")[key];
+						var childLi=ulname.children;
+						for(var r=0;r<childLi.length;r++)
+						{
+							childLi[r].className="normalColor";
+						}
+					};
+				}
+			};
+		}
+	}
+</script>
